@@ -1,6 +1,7 @@
 import { Message, MessageType } from "discord.js";
 import { Command, CommandMatch } from "../../lib/command";
 import { Lead, State, IStateContainer } from "../../lib/state";
+import { safeSend } from "../safeSend";
 
 export class FiredHiredCommand extends Command {
   regex = /!((?<fired>fired)|(?<hired>hired))/;
@@ -46,7 +47,7 @@ export class FiredHiredCommand extends Command {
         const m = await msg.fetchReference();
         const ping = m.author.toString();
         this.firedStack.push(ping);
-        await msg.channel.send(`${ping} Fired`);
+        await safeSend (msg.channel, `${ping} Fired`);
         return;
       }
 
@@ -59,7 +60,7 @@ export class FiredHiredCommand extends Command {
 
       // If there's no one to fire, cancel.
       if (fireable.length == 0) {
-        await msg.channel.send(this.noGIF);
+        await safeSend (msg.channel, this.noGIF);
         return;
       }
 
@@ -68,11 +69,11 @@ export class FiredHiredCommand extends Command {
       this.firedStack.push(fired.ping);
 
       // "Fire" them.
-      await msg.channel.send(`${fired.ping} Fired`);
+      await safeSend (msg.channel, `${fired.ping} Fired`);
     } else {
       // If there's no one to hire, don't hire anyone.
       if (this.firedStack.length == 0) {
-        await msg.channel.send(this.noGIF);
+        await safeSend (msg.channel, this.noGIF);
         return;
       }
 
@@ -84,7 +85,7 @@ export class FiredHiredCommand extends Command {
         this.hireJokes[Math.floor(Math.random() * this.hireJokes.length)];
 
       // "Hire" them.
-      await msg.channel.send(hired + joke);
+      await safeSend (msg.channel, hired + joke);
     }
   }
 }

@@ -7,6 +7,7 @@ import {
 import { Command, CommandMatch } from "../../lib/command";
 import { State, IStateContainer } from "../../lib/state";
 import { User } from "../../lib/wheniwork/shifts";
+import { safeSend } from "../safeSend";
 
 export class RegisterWhenIWorkCommand extends Command {
   regex = /^!wiw register (?<email>\w+@ucsd\.edu) ?(?<ping><@\d+>)?$/;
@@ -39,17 +40,17 @@ export class RegisterWhenIWorkCommand extends Command {
     );
 
     if (!res.ok) {
-      await msg.channel.send("Could not reach the WhenIWork API.");
+      await safeSend (msg.channel, "Could not reach the WhenIWork API.");
       return;
     }
 
     let data: { users: User[] } = await res.json();
 
     if (data.users.length == 0) {
-      await msg.channel.send("No user found with that email.");
+      await safeSend (msg.channel, "No user found with that email.");
       return;
     } else if (data.users.length > 1) {
-      await msg.channel.send("Multiple users found with that email.");
+      await safeSend (msg.channel, "Multiple users found with that email.");
       return;
     }
 
@@ -91,7 +92,7 @@ export class RemoveWhenIWorkCommand extends Command {
     );
 
     if (!entry) {
-      await msg.channel.send("No user found with that email.");
+      await safeSend (msg.channel, "No user found with that email.");
       return;
     }
 
@@ -130,7 +131,7 @@ export class ListWhenIWorkCommand extends Command {
     let chunks = users.join("\n").match(/(.|[\r\n]){1,2000}/g)!;
 
     for (let chunk of chunks) {
-      await msg.channel.send({
+      await safeSend (msg.channel, {
         content: chunk,
         allowedMentions: { parse: [] },
       });

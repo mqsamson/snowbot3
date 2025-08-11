@@ -28,7 +28,11 @@ RUN --mount=type=bind,source=package.json,target=package.json \
     --mount=type=bind,source=src/,target=src/ \
     npm run build
 
+
 COPY ./entry.sh /home/snowbot/entry.sh
 
+# Temp lines, debugging
+RUN ls -l /home/snowbot
+RUN chmod +x /home/snowbot/entry.sh
 # Run the application.
 ENTRYPOINT [ "/home/snowbot/entry.sh" ]

@@ -2,6 +2,7 @@ import { PermissionFlagsBits, Message, UserMention } from "discord.js";
 import { Command, CommandMatch, rebuildEvent } from "../../lib/command";
 import { Lead, State, IStateContainer } from "../../lib/state";
 import { Phonebook } from ".";
+import { safeSend } from "../safeSend";
 
 export class AddLeadCommand extends Command {
   regex = /^!lead add (?<ping><@\d+>) (?<name>\w+)$/;
@@ -23,8 +24,8 @@ export class AddLeadCommand extends Command {
     const currState = await state.read();
 
     // Don't add if they already exist.
-    if (currState.leads.find((lead) => lead.ping == ping)) {
-      await msg.channel.send(`${ping} is already a lead.`);
+    if (msg.channel.isSendable() && currState.leads.find((lead) => lead.ping == ping)) {
+      await safeSend (msg.channel, `${ping} is already a lead.`);
       return;
     }
 
@@ -64,7 +65,7 @@ export class EmoteLeadCommand extends Command {
     try {
       await msg.guild?.emojis.fetch(emote_id);
     } catch (e) {
-      await msg.channel.send(`${emote_name} is not in this server.`);
+      await safeSend (msg.channel, `${emote_name} is not in this server.`);
       return;
     }
 
@@ -74,14 +75,14 @@ export class EmoteLeadCommand extends Command {
     const lead_ind = currState.leads.findIndex((lead) => lead.ping == ping);
 
     // If the index doesn't exist, can't edit.
-    if (lead_ind == -1) {
-      await msg.channel.send(`${ping} is not a lead.`);
+    if (msg.channel.isSendable() && lead_ind == -1) {
+      await safeSend (msg.channel, `${ping} is not a lead.`);
       return;
     }
 
     // If the emote is already taken, don't add it.
-    if (currState.leads.find((lead) => lead.emote == emote)) {
-      await msg.channel.send(`${emote} is already in use.`);
+    if (msg.channel.isSendable() && currState.leads.find((lead) => lead.emote == emote)) {
+      await safeSend (msg.channel, `${emote} is already in use.`);
       return;
     }
 
@@ -131,8 +132,8 @@ export class RemoveLeadCommand extends Command {
     const lead = currState.leads.findIndex((lead) => lead.ping == ping);
 
     // If the index doesn't exist, can't edit.
-    if (lead == -1) {
-      await msg.channel.send(`${ping} is not a lead.`);
+    if (msg.channel.isSendable() && lead == -1) {
+      await safeSend (msg.channel, `${ping} is not a lead.`);
       return;
     }
 
@@ -172,8 +173,8 @@ export class FireableLeadCommand extends Command {
     const lead = currState.leads.findIndex((lead) => lead.ping == ping);
 
     // If the index doesn't exist, can't edit.
-    if (lead == -1) {
-      await msg.channel.send(`${match.groups.ping} is not a lead.`);
+    if (msg.channel.isSendable() && lead == -1) {
+      await safeSend (msg.channel, `${match.groups.ping} is not a lead.`);
       return;
     }
 
@@ -212,7 +213,9 @@ export class RebuildLeadCommand extends Command {
     this.phonebook.emojiList = generateEmojis((await state.read()).leads);
     this.phonebook.dispatchEvent(rebuildEvent);
 
-    await msg.channel.send("Rebuilt");
+    if(msg.channel.isSendable()){
+      await safeSend (msg.channel, "Rebuilt");
+    }
   }
 }
 
@@ -235,7 +238,9 @@ function generateEmojiCommand(lead: Lead): Command | undefined {
     name: lead.emote,
     description: `${lead.emoteName} dials ${lead.name}`,
     async execute(msg: Message) {
-      await msg.channel.send(lead.ping);
+      if(msg.channel.isSendable()){
+      await safeSend (msg.channel, lead.ping);
+      }
     },
     async initialize() {},
   };

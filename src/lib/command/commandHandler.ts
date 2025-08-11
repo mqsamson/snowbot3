@@ -2,6 +2,7 @@ import { APIEmbedField, EmbedBuilder, Message } from "discord.js";
 import { CommandModule } from "./commandModule";
 import { Command, CommandMatch } from "./command";
 import { State, IStateContainer } from "../state";
+import { safeSend } from "../../commands/safeSend";
 
 /**
  * Manages the parsing and execution of commands, as well as auto-generating help commands.
@@ -141,7 +142,7 @@ export class CommandHandler {
           .setTitle(titleNarrowed)
           .addFields(...helpFields);
 
-        msg.channel.send({ embeds: [helpEmbed] });
+        safeSend (msg.channel, { embeds: [helpEmbed] });
       },
       initialize: async () => {},
     };

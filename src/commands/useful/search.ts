@@ -1,5 +1,6 @@
 import { Message, EmbedBuilder } from "discord.js";
 import { Command, CommandMatch } from "../../lib/command";
+import { safeSend } from "../safeSend";
 
 export class SnowCommand extends Command {
   regex = /!(snow (?<arg>\w+)|(?<ticket>[a-zA-Z]{2,6}\d{7}))/;
@@ -18,7 +19,7 @@ export class SnowCommand extends Command {
       `[Ticket ${ticket.toUpperCase()}](${ticketUrl})`,
     );
 
-    await msg.channel.send({ embeds: [ticketEmbed] });
+    await safeSend (msg.channel, { embeds: [ticketEmbed] });
   }
 }
 
@@ -37,7 +38,7 @@ export class KnowledgeBaseCommand extends Command {
       `[Knowledge Base Search Results](${kbUrl})`,
     );
 
-    msg.channel.send({ embeds: [kbEmbed] });
+    safeSend (msg.channel, { embeds: [kbEmbed] });
   }
 }
 
@@ -56,7 +57,7 @@ export class CollabCommand extends Command {
       `[Collab Search Results](${collabUrl})`,
     );
 
-    await msg.channel.send({ embeds: [collabEmbed] });
+    await safeSend (msg.channel, { embeds: [collabEmbed] });
   }
 }
 
@@ -72,7 +73,7 @@ export class MailUpdCommand extends Command {
       `[MailUPD page for ${user}](${mailUpdUrl})`,
     );
 
-    await msg.channel.send({ embeds: [mailUpdEmbed] });
+    await safeSend (msg.channel, { embeds: [mailUpdEmbed] });
   }
 }
 
@@ -88,6 +89,6 @@ export class SalCommand extends Command {
       `[SAL page for ${pid}](${salUrl})`,
     );
 
-    await msg.channel.send({ embeds: [salEmbed] });
+    await safeSend (msg.channel, { embeds: [salEmbed] });
   }
 }

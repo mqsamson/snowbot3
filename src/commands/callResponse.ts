@@ -1,5 +1,6 @@
 import { Message } from "discord.js";
 import { Command } from "../lib/command";
+import { safeSend } from "./safeSend";
 
 /**
  * A command that responds to a message with a string.
@@ -21,7 +22,8 @@ export class CallResponseCommand extends Command {
     return new RegExp(this.name);
   }
 
+
   async execute(msg: Message): Promise<void> {
-    await msg.channel.send(this.response);
+      await safeSend (msg.channel, this.response);
   }
 }
